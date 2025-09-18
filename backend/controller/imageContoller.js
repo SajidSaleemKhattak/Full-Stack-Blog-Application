@@ -8,7 +8,6 @@ cloudinary.config({
 export async function uploadImage(req, res) {
   const file = req.files.image;
   cloudinary.uploader.upload(file.tempFilePath, async (error, result) => {
-    console.log(result);
     if (result) {
       const newImage = await ImageDOC.create(result);
       if (newImage) res.status(200).json(newImage);

@@ -1,11 +1,16 @@
 "use client";
-import { FileInput as FileInputIcon } from "lucide-react";
+import { FileInput as FileInputIcon, Loader } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const FeatureImage = () => {
+interface FeatureImageProps {
+  onUpload: (url: string) => void; // 👈 send uploaded url to parent
+}
+
+const FeatureImage = ({ onUpload }: FeatureImageProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const FileInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -26,19 +31,27 @@ const FeatureImage = () => {
 
   const handleUpload = async () => {
     if (!file) return;
+    setLoading(true);
 
-    const formData = new FormData();
-    formData.append("image", file);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
 
-    const res = await fetch("http://localhost:5000/api/blog/upload", {
-      method: "POST",
-      body: formData,
-    });
+      const res = await fetch("http://localhost:5000/api/blog/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.url) {
-      setUploadedImage(data.url);
+      if (data.url) {
+        setUploadedImage(data.url);
+        onUpload(data.url);
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,22 +69,24 @@ const FeatureImage = () => {
       {preview && (
         <div>
           <p>Preview</p>
-          <img className="w-34 h-34 rounded-sm" src={preview} alt="preview" />
+          <img className="w-3/4 h-3/4 rounded-sm" src={preview} alt="preview" />
         </div>
       )}
 
       <button
         onClick={handleUpload}
-        className="bg-black text-white px-4 p-1 text-sm rounded-sm"
+        disabled={loading}
+        className="bg-black text-white px-4 p-1 text-sm rounded-sm disabled:opacity-50"
       >
-        {" "}
-        Upload Image{" "}
+        {loading ? "Uploading..." : "Upload Image"}
       </button>
+
+      {loading && <Loader className="animate-spin text-black" />}
 
       {uploadedImage && (
         <div>
           <p>Uploaded Image:</p>
-          <img src={uploadedImage} className="w-30 h-30" alt="uploaded" />
+          <img src={uploadedImage} className="w-3/4 h-30" alt="uploaded" />
         </div>
       )}
     </div>

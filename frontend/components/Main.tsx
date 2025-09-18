@@ -7,7 +7,7 @@ const Main = async () => {
   return (
     <div className="grid grid-cols-4 gap-4">
       {blogPosts.map((eachItem: any, index: number) => (
-        // <Link href={""}>
+        <Link href={""}>
         <div key={index}>
           <img
             className="w-48 h-42 object-cover rounded-sm"
@@ -23,7 +23,7 @@ const Main = async () => {
             </p>
           </div>
         </div>
-        // {/* </Link> */}
+        </Link>
       ))}
     </div>
   );
