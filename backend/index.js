@@ -3,6 +3,9 @@ import mongoose from "mongoose";
 import router from "./routes/route.js";
 import cors from "cors";
 const app = express();
+import dotenv from "dotenv";
+import fileUpload from "express-fileupload";
+dotenv.config();
 
 // Mongoose Connectivity
 try {
@@ -16,6 +19,13 @@ app.use(cors({ origin: "*" }));
 
 // Parsing the incomeing Requests
 app.use(express.json());
+
+// upload temporary files
+app.use(
+  fileUpload({
+    useTempFiles: true,
+  })
+);
 
 // Route Handler
 app.use("/api/blog", router);
